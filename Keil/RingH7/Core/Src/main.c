@@ -84,7 +84,7 @@ T_RINGState RingState;
 T_RingIO_Head RMessHead;  // recieve header
 T_RingIO_Head KvHead;
 T_RingIO_SchData cod_sched_info, kvcod_sched_info;
-T_RingIO_BlockInfo RingBlockInfo, kvRingBlockInfo, kvEndBlockInfo;
+T_RingIO_BlockInfo RingBlockInfo, kvRingBlockInfo, kvRingBlock, kvEndBlockInfo;
 T_RingIO_Status RingStatus, PCSyncTime, kvPCSyncTime;
 
 uint8_t answer_index;
@@ -226,19 +226,23 @@ int main(void)
   while (1)
   {
 #ifdef USE_DS3231		
-		if(RingState.el.RTC_DS_State == RTC_OK)
-		{
-			NowTime.Hours = DS3231_GetHour();
-			NowTime.Minutes = DS3231_GetMinute(); 
-			NowTime.Seconds = DS3231_GetSecond();
-			NowDate.Date = DS3231_GetDate();
-			NowDate.Month = DS3231_GetMonth();
-			NowYear = DS3231_GetYear();
-			NowDate.Year = NowYear % 100;
-			NowDate.WeekDay = DS3231_GetDayOfWeek();
-		}
-		else
+		if(WorkMode == AUTOWORK)
+		{			
+		  if(RingState.el.RTC_DS_State == RTC_OK)
+		  {
+		  	NowTime.Hours = DS3231_GetHour();
+				NowTime.Minutes = DS3231_GetMinute();
+				NowTime.Seconds = DS3231_GetSecond();
+				NowDate.Date = DS3231_GetDate();
+				NowDate.Month = DS3231_GetMonth();
+				NowYear = DS3231_GetYear();
+				NowDate.Year = NowYear % 100;
+				NowDate.WeekDay = DS3231_GetDayOfWeek();
+			}
+		}	
+
 #endif		
+		if(RingState.el.RTC_DS_State != RTC_OK)
 		{
 			HAL_RTC_GetDate(&hrtc, &NowDate, RTC_FORMAT_BIN);
 			HAL_RTC_GetTime(&hrtc, &NowTime, RTC_FORMAT_BIN);	
@@ -246,7 +250,6 @@ int main(void)
 		
 		if(WorkMode == SETUP)
 		{	
-			
 			// define RTC	status
 			if(RingState.el.RTC_EMB_State == RTC_NO) // start
 			{
@@ -255,17 +258,17 @@ int main(void)
 			}	
 
 #ifdef USE_DS3231				
-				if(RingState.el.RTC_DS_State == RTC_NO)
-				{
-					io_result = HAL_I2C_Master_Transmit(&hi2c1, DS3231_I2C_ADDR << 1, 0, 1, 1000);
-					io_result = HAL_I2C_Master_Receive(&hi2c1, DS3231_I2C_ADDR << 1, &ui8_buf, 1, 1000);
+			if(RingState.el.RTC_DS_State == RTC_NO)
+			{
+				io_result = HAL_I2C_Master_Transmit(&hi2c1, DS3231_I2C_ADDR << 1, 0, 1, 1000);
+				io_result = HAL_I2C_Master_Receive(&hi2c1, DS3231_I2C_ADDR << 1, &ui8_buf, 1, 1000);
 					
-					if(io_result == HAL_OK)
-					{
-						if(DS3231_GetYear() == 2000) RingState.el.RTC_DS_State = RTC_RESET;
-						                				else RingState.el.RTC_DS_State = RTC_OK;
-				  }
-				}
+				if(io_result == HAL_OK)
+				{
+					if(DS3231_GetYear() == 2000) RingState.el.RTC_DS_State = RTC_RESET;
+					                				else RingState.el.RTC_DS_State = RTC_OK;
+			  }
+			}
 #endif				
 
 			
@@ -374,7 +377,7 @@ int main(void)
 //		HAL_GPIO_WritePin(GPIOB, LD3R_Pin, GPIO_PIN_RESET);
 #endif			
 			
-			if(today_day != NowDate.Date)
+			if(today_day != NowDate.Date || RingState.el.ready != RING_READY)
 			{
 				WorkMode = SETUP;  // check out for new day's begining or setup wasn't finished
 			}
@@ -385,76 +388,46 @@ int main(void)
 			
 			}
 			
-
-
-			
-			// checkout control line 
-			if(UartReady == SET) // we got something from UART
-			{
-				IOState = IO_CHECK;
-			}// SET
 			
 	  }
 //================================================================
-		
-		if(IOState == IO_CHECK)
+
+//------------------------- check UART----------------------------		
+	  if(UartReady == SET)
 		{
-#ifdef MY_DEBUG	
- // 	HAL_GPIO_WritePin(GPIOB, LD3R_Pin, GPIO_PIN_SET); 
-#endif				
-			if(UartReady == SET)
-			{
 #ifdef MY_DEBUG		
 		HAL_GPIO_WritePin(GPIOB, LD2B_Pin, GPIO_PIN_SET);
 #endif					
 				
-				if(RMessHead.name == RING_PROT_NAME)
-			  {
-	  			WorkMode = REM_CONTROL;
-	  			IOState = GET_COMMAND;
- // 				busy_time = 5;
+			if(RMessHead.name == RING_PROT_NAME)
+		  {
+				WorkMode = REM_CONTROL;
+	  		IOState = GET_COMMAND;
 										
-					link_time = NowTime.Seconds + NowTime.Minutes * 100;
-  			}
-  			else
+				link_time = NowTime.Seconds + NowTime.Minutes * 100;
+  		}
+  		else
+  		{
+  			memcpy(&KvHead, &RMessHead, sizeof(KvHead));
+  				
+  			// get trash
+  			HAL_UART_Transmit_IT(&huart3, (uint8_t *)&KvHead, sizeof(KvHead)); // send it back
+  			while(io_result != HAL_TIMEOUT)
   			{
-  				memcpy(&KvHead, &RMessHead, sizeof(KvHead));
+  				io_result = HAL_UART_Receive(&huart3, &busy_time, 1, 1);
+  				HAL_UART_Transmit_IT(&huart3, &busy_time, 1); // send it back
+  			}
   				
-  				// get trash
-  				HAL_UART_Transmit_IT(&huart3, (uint8_t *)&KvHead, sizeof(KvHead)); // send it back
-  				while(io_result != HAL_TIMEOUT)
-  				{
-  					io_result = HAL_UART_Receive(&huart3, &busy_time, 1, 1);
-  					HAL_UART_Transmit_IT(&huart3, &busy_time, 1); // send it back
-  				}
-  				
-  				UartReady = RESET;
-  				memset(&RMessHead,0,sizeof(RMessHead));
-  				io_result = HAL_UART_Receive_IT(&huart3, (uint8_t *)&RMessHead, sizeof(RMessHead)); // set waiting new data
-  			}			
-			}	
-#ifdef MY_DEBUG	
-//		else
-//		{
-//			HAL_Delay(200);
-//			HAL_GPIO_WritePin(GPIOB, LD3R_Pin, GPIO_PIN_RESET);
-//		}	
-#endif					
-		}//IO_CHECK
+  			UartReady = RESET;
+  			memset(&RMessHead,0,sizeof(RMessHead));
+  			io_result = HAL_UART_Receive_IT(&huart3, (uint8_t *)&RMessHead, sizeof(RMessHead)); // set waiting new data
+  		}			
+		}	
 //=================================================================			
 	
 		if(WorkMode == REM_CONTROL)
 		{
-#ifdef MY_DEBUG	
-//	  HAL_GPIO_WritePin(GPIOB, LD2B_Pin, GPIO_PIN_SET);		
-//		HAL_Delay(100);
-//	  HAL_GPIO_WritePin(GPIOB, LD2B_Pin, GPIO_PIN_RESET);		
-//		HAL_Delay(100);
-///	  HAL_GPIO_WritePin(GPIOB, LD2B_Pin, GPIO_PIN_SET);
-//		HAL_Delay(100);
-//	  HAL_GPIO_WritePin(GPIOB, LD2B_Pin, GPIO_PIN_RESET);			
-#endif
-			
+			// check timeuot for remote control mode
 			if(   IOState == IO_CHECK
 				 && RingState.el.ready == RING_READY
 				)	
@@ -463,12 +436,12 @@ int main(void)
 				busy_time = NowTime.Seconds + NowTime.Minutes * 100;
 				if(busy_time > link_time)
 				{
-					if((busy_time - link_time) >= 130) WorkMode = AUTOWORK;
+					if((busy_time - link_time) >= REMOTE_CONTROL_TIMEOUT) WorkMode = AUTOWORK;
 				}
 				else
 				if(busy_time < link_time)	
 				{
-					if((busy_time + 6000 - link_time) >= 130) WorkMode = AUTOWORK;
+					if((busy_time + 6000 - link_time) >= REMOTE_CONTROL_TIMEOUT) WorkMode = AUTOWORK;
 				}
 				
 			}
@@ -553,7 +526,7 @@ int main(void)
 
 						if(io_result == HAL_OK)
 						{
-							/// save schedule file crc32
+						 /// save schedule file crc32
 							schedule_crc32 = cod_sched_info.data.crc32;
 							
 							// save schedule file size
@@ -656,10 +629,6 @@ int main(void)
 #endif						
 						if(io_result == HAL_OK)
 						{
-//							WorkMode = SYNC_TIME;
-//							IOState = IO_CHECK;
-
-							
 							if(PCSyncTime.data.data1 == 0) // sync seconds
 							{
 								PCTime.Seconds	= PCSyncTime.data.data4;
@@ -671,6 +640,8 @@ int main(void)
 								PCTime.Hours = PCSyncTime.data.data2;
 								PCTime.Minutes = PCSyncTime.data.data3;
 								PCDate.WeekDay = PCSyncTime.data.data4;
+								
+								HAL_RTC_SetTime(&hrtc, &PCTime, RTC_FORMAT_BIN);
 																
 								InitRingSyncTime(&kvPCSyncTime, PCTime.Hours, PCTime.Minutes, PCTime.Seconds, PCDate.WeekDay);
 						  }
@@ -683,7 +654,6 @@ int main(void)
 								PCDate.Date = PCSyncTime.data.data4;
 								
 								HAL_RTC_SetDate(&hrtc, &PCDate, RTC_FORMAT_BIN);
-								HAL_RTC_SetTime(&hrtc, &PCTime, RTC_FORMAT_BIN);
 								
 								InitRingSyncTime(&kvPCSyncTime, PCDate.Year, PCDate.Month, PCDate.Date, PCDate.WeekDay);
 								
@@ -746,7 +716,8 @@ int main(void)
 					}
 					case RING_KV_BLOCK:
 					{
-						HAL_UART_Transmit_IT(&huart3, (uint8_t *)&kvRingBlockInfo, sizeof(kvRingBlockInfo)); // send it back
+						InitBlockInfo(&kvRingBlock, 0xA, 0xB, 0xC);
+						HAL_UART_Transmit_IT(&huart3, (uint8_t *)&kvRingBlock, sizeof(kvRingBlock)); // send it back
 						break;
 					}
 					case RING_END_BLOCK:
@@ -795,7 +766,8 @@ int main(void)
 						
 						get_crc32 = CRC32((unsigned char*)&io_buf, block_size);
 						
-						InitBlockInfo(&kvRingBlockInfo, number_block, block_size, get_crc32);
+						//InitBlockInfo(&kvRingBlock, number_block, block_size, get_crc32);
+						InitBlockInfo(&kvRingBlock, 0xA, 0xB, 0xC);
 						
 						if(get_crc32 == block_crc32)
 						{
@@ -808,13 +780,13 @@ int main(void)
 						}
 						else
 						{
-							SetRingError(&kvRingBlockInfo.head);
+							SetRingError(&kvRingBlock.head);
 						}
 					}	
 					else
 					{
-						InitBlockInfo(&kvRingBlockInfo,number_block , 0, 0); 
-						SetRingError(&kvRingBlockInfo.head);
+						InitBlockInfo(&kvRingBlock,number_block , 0, 0); 
+						SetRingError(&kvRingBlock.head);
 					}
 					
 					answer_index = RING_KV_BLOCK;
@@ -855,67 +827,7 @@ int main(void)
 		}// TRANSIT_DATA
 //======================================================================		
 		
-		if(WorkMode == SYNC_TIME)
-		{
-			while(WorkMode == SYNC_TIME)
-			{
-				if(UartReady == SET)
-				{
-					if(PCSyncTime.data.data1 == 0) // sync seconds
-					{
-						PCTime.Seconds	= PCSyncTime.data.data4;
-						InitRingSyncTime(&kvPCSyncTime, 0, 0, 0, PCTime.Seconds);
-					}
-					else
-					if(PCSyncTime.data.data1 == 1) // sync time
-					{
-						PCTime.Hours = PCSyncTime.data.data2;
-						PCTime.Minutes = PCSyncTime.data.data3;
-						PCDate.WeekDay = PCSyncTime.data.data4;
-																
-						InitRingSyncTime(&kvPCSyncTime, PCTime.Hours, PCTime.Minutes, PCTime.Seconds, PCDate.WeekDay);
-					}
-					else
-					if(PCSyncTime.data.data1 == 2) // sync date
-					{
-						NowYear = PCSyncTime.data.data2;
-						PCDate.Year = NowYear % 100;
-						PCDate.Month = PCSyncTime.data.data3;
-						PCDate.Date = PCSyncTime.data.data4;
-						
-						HAL_RTC_SetDate(&hrtc, &PCDate, RTC_FORMAT_BIN);
-						HAL_RTC_SetTime(&hrtc, &PCTime, RTC_FORMAT_BIN);
-						
-						InitRingSyncTime(&kvPCSyncTime, PCDate.Year, PCDate.Month, PCDate.Date, PCDate.WeekDay);
-						
-						RingState.el.RTC_EMB_State = RTC_OK;
-						if(RingState.el.RTC_DS_State == RTC_OK) RingState.el.RTC_DS_State = RTC_RESET;
-#ifdef MY_DEBUG	
-//	  HAL_GPIO_WritePin(GPIOB, LD2B_Pin|LD3R_Pin, GPIO_PIN_RESET);	
-#endif
-						
-						WorkMode = SETUP;
-					}							
-					
-					HAL_UART_Transmit_IT(&huart3, (uint8_t *)&kvPCSyncTime, sizeof(kvPCSyncTime)); // send it back
-					UartReady = RESET;
-					
-					if(WorkMode == SYNC_TIME)
-					{					
-					  io_result = HAL_UART_Receive_IT(&huart3, (uint8_t *)&PCSyncTime, sizeof(PCSyncTime)); // set waiting new data							
-					}
-					else
-					{
-						memset(&RMessHead,0,sizeof(RMessHead));
-						io_result = HAL_UART_Receive_IT(&huart3, (uint8_t *)&RMessHead, sizeof(RMessHead)); // set waiting new data				
-						
-						IOState = IO_CHECK;
-						answer_index = RING_IDLE_DATA;						
-					}
-				}
-			}
-		}// SYNC_TIME
-//======================================================================
+	
 
 		
 		

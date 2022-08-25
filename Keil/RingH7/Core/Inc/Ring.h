@@ -6,6 +6,8 @@
 
 #define MY_DEBUG
 
+//#define USE_DS3231
+
 //-----------------------------------------------------
 
 //---------------- USE FLASH
@@ -18,6 +20,9 @@
 typedef enum {SETUP, AUTOWORK, REM_CONTROL, TRANSIT_DATA, SYNC_TIME} T_WorkState;
 
 typedef enum {IO_CHECK, GET_COMMAND, ANSWER, GET_DATA_BLOCK, WAIT_SCHEDULE} T_IOState;
+
+#define REMOTE_CONTROL_TIMEOUT  130 /// min+sec in dec
+
 //---------------------------------------------------------
 
 //---------------- STATE
@@ -48,7 +53,7 @@ typedef union
 #define RING_READY      1 // setup done
 //----------------------------------------------------------
 
-#define USE_DS3231
+
 
 #endif // RING_H
 
