@@ -242,7 +242,7 @@ int main(void)
 	 }
 		
 #endif		
-		if(RingState.el.RTC_DS_State != RTC_OK)
+		if(WorkMode != AUTOWORK)
 		{
 			HAL_RTC_GetDate(&hrtc, &NowDate, RTC_FORMAT_BIN);
 			HAL_RTC_GetTime(&hrtc, &NowTime, RTC_FORMAT_BIN);	

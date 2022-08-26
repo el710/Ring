@@ -41,4 +41,5 @@ ringh7/main.o: ..\Core\Src\main.c ..\Core\Inc\main.h \
   ..\Drivers\STM32H7xx_HAL_Driver\Inc\stm32h7xx_hal_pcd_ex.h \
   D:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdlib.h \
   D:\Keil_v5\ARM\ARMCLANG\Bin\..\include\string.h ..\Core\Inc\crc32.h \
-  ..\Core\Inc\Ring_prot.h ..\Core\Inc\rdefUART.h ..\Core\Inc\Ring.h
+  ..\Core\Inc\Ring_prot.h ..\Core\Inc\rdefUART.h ..\Core\Inc\Ring.h \
+  ..\Core\Inc\ds3231_for_stm32_hal.h
