@@ -410,6 +410,11 @@
               <FilePath>..\Core\Src\Ring_prot.c</FilePath>
             </File>
             <File>
+              <FileName>ds3231_for_stm32_hal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\ds3231_for_stm32_hal.c</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/main.c</FilePath>
@@ -423,11 +428,6 @@
               <FileName>stm32h7xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/stm32h7xx_hal_msp.c</FilePath>
-            </File>
-            <File>
-              <FileName>ds3231_for_stm32_hal.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\ds3231_for_stm32_hal.c</FilePath>
             </File>
           </Files>
         </Group>

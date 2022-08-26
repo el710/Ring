@@ -15,11 +15,11 @@ I2C_HandleTypeDef *_ds3231_ui2c;
  */
 void DS3231_Init(I2C_HandleTypeDef *hi2c) {
 	_ds3231_ui2c = hi2c;
-	DS3231_EnableAlarm1(DS3231_DISABLED);
-	DS3231_EnableAlarm2(DS3231_DISABLED);
-	DS3231_ClearAlarm1Flag();
-	DS3231_ClearAlarm2Flag();
-	DS3231_SetInterruptMode(DS3231_ALARM_INTERRUPT);
+//	DS3231_EnableAlarm1(DS3231_DISABLED);
+//	DS3231_EnableAlarm2(DS3231_DISABLED);
+//	DS3231_ClearAlarm1Flag();
+//	DS3231_ClearAlarm2Flag();
+//	DS3231_SetInterruptMode(DS3231_ALARM_INTERRUPT);
 }
 
 /**

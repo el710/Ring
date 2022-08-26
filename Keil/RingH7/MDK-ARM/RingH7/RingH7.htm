@@ -3,7 +3,7 @@
 <title>Static Call Graph - [RingH7\RingH7.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image RingH7\RingH7.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6180002: Last Updated: Thu Aug 25 17:36:35 2022
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6180002: Last Updated: Fri Aug 26 14:08:21 2022
 <BR><P>
 <H3>Maximum Stack Usage =       1100 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -792,7 +792,7 @@ Global Symbols
 
 <P><STRONG><a name="[13e]"></a>_ll_udiv</STRONG> (Thumb, 240 bytes, Stack size 48 bytes, lludivv7m.o(.text), UNUSED)
 
-<P><STRONG><a name="[119]"></a>__aeabi_memcpy</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, rt_memcpy_v6.o(.text))
+<P><STRONG><a name="[11a]"></a>__aeabi_memcpy</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, rt_memcpy_v6.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
@@ -1017,11 +1017,11 @@ Global Symbols
 <LI><a href="#[da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USB_SetCurrentMode
 </UL>
 
-<P><STRONG><a name="[114]"></a>HAL_FLASH_Lock</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, stm32h7xx_hal_flash.o(.text.HAL_FLASH_Lock))
+<P><STRONG><a name="[115]"></a>HAL_FLASH_Lock</STRONG> (Thumb, 48 bytes, Stack size 0 bytes, stm32h7xx_hal_flash.o(.text.HAL_FLASH_Lock))
 <BR><BR>[Called By]<UL><LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[113]"></a>HAL_FLASH_Unlock</STRONG> (Thumb, 88 bytes, Stack size 0 bytes, stm32h7xx_hal_flash.o(.text.HAL_FLASH_Unlock))
+<P><STRONG><a name="[114]"></a>HAL_FLASH_Unlock</STRONG> (Thumb, 88 bytes, Stack size 0 bytes, stm32h7xx_hal_flash.o(.text.HAL_FLASH_Unlock))
 <BR><BR>[Called By]<UL><LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
@@ -1439,7 +1439,7 @@ Global Symbols
 <LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_RxISR_8BIT
 </UL>
 
-<P><STRONG><a name="[115]"></a>HAL_UART_Transmit_IT</STRONG> (Thumb, 320 bytes, Stack size 0 bytes, stm32h7xx_hal_uart.o(.text.HAL_UART_Transmit_IT))
+<P><STRONG><a name="[113]"></a>HAL_UART_Transmit_IT</STRONG> (Thumb, 320 bytes, Stack size 0 bytes, stm32h7xx_hal_uart.o(.text.HAL_UART_Transmit_IT))
 <BR><BR>[Called By]<UL><LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
@@ -1476,7 +1476,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[11a]"></a>InitRingSyncTime</STRONG> (Thumb, 30 bytes, Stack size 8 bytes, ring_prot.o(.text.InitRingSyncTime))
+<P><STRONG><a name="[119]"></a>InitRingSyncTime</STRONG> (Thumb, 30 bytes, Stack size 8 bytes, ring_prot.o(.text.InitRingSyncTime))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = InitRingSyncTime
 </UL>
 <BR>[Called By]<UL><LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -1623,14 +1623,14 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32h743xx.o(RESET)
 </UL>
-<P><STRONG><a name="[ad]"></a>main</STRONG> (Thumb, 2600 bytes, Stack size 56 bytes, main.o(.text.main))
+<P><STRONG><a name="[ad]"></a>main</STRONG> (Thumb, 2544 bytes, Stack size 56 bytes, main.o(.text.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 1100 + Unknown Stack Size
 <LI>Call Chain = main &rArr; CRC32
 </UL>
-<BR>[Calls]<UL><LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Receive
-<LI><a href="#[115]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit_IT
-<LI><a href="#[114]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_FLASH_Lock
-<LI><a href="#[113]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_FLASH_Unlock
+<BR>[Calls]<UL><LI><a href="#[115]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_FLASH_Lock
+<LI><a href="#[114]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_FLASH_Unlock
+<LI><a href="#[fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Receive
+<LI><a href="#[113]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_Transmit_IT
 <LI><a href="#[112]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RTC_GetTime
 <LI><a href="#[111]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RTC_GetDate
 <LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
@@ -1652,7 +1652,7 @@ Global Symbols
 <LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_WritePin
 <LI><a href="#[100]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SystemClock_Config
 <LI><a href="#[cf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Init
-<LI><a href="#[11a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitRingSyncTime
+<LI><a href="#[119]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitRingSyncTime
 <LI><a href="#[117]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitRingState
 <LI><a href="#[118]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitRingTransfer
 <LI><a href="#[109]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitRingEndSched
@@ -1662,7 +1662,7 @@ Global Symbols
 <LI><a href="#[106]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RingInitHead
 <LI><a href="#[105]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SetIdleData
 <LI><a href="#[10a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CRC32
-<LI><a href="#[119]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memcpy
+<LI><a href="#[11a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memcpy
 <LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;free
 <LI><a href="#[b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;malloc
 </UL>
