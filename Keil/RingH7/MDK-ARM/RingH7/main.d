@@ -42,4 +42,4 @@ ringh7/main.o: ..\Core\Src\main.c ..\Core\Inc\main.h \
   D:\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdlib.h \
   D:\Keil_v5\ARM\ARMCLANG\Bin\..\include\string.h ..\Core\Inc\crc32.h \
   ..\Core\Inc\Ring_prot.h ..\Core\Inc\rdefUART.h ..\Core\Inc\Ring.h \
-  ..\Core\Inc\ds3231_for_stm32_hal.h
+  ..\Core\Inc\Schedlib.h ..\Core\Inc\ds3231_for_stm32_hal.h

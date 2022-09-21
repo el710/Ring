@@ -48,6 +48,7 @@ typedef union
 #define SCHED_IS        1  // schedule file on flash
 #define SCHED_RAM       2  // schedule file on RAM - gotten from PC
 #define SCHED_ON        3  // schedule ready for work
+#define SCHED_ERR       4  // schedule can not be setup
 
 #define RING_SETUP      0 // setup RTC & Schedule
 #define RING_READY      1 // setup done

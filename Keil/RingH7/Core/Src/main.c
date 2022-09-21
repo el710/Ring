@@ -34,6 +34,8 @@
 
 #include "Ring.h"
 
+#include "Schedlib.h"
+
 #ifdef USE_DS3231
    #include "ds3231_for_stm32_hal.h"
 #endif
@@ -89,7 +91,7 @@ T_RingIO_Status RingStatus, PCSyncTime, kvPCSyncTime;
 
 uint8_t answer_index;
 
-uint8_t *Schedule;  
+uint8_t* Schedule;  
 uint8_t buf_head;
 uint8_t io_buf[IO_BLOCK_SIZE];
 
@@ -111,6 +113,7 @@ uint16_t NowYear;
 RTC_TimeTypeDef PCTime;
 RTC_DateTypeDef PCDate;
 
+T_EventList  BaseEventList, TodayEventList;
 
 /* USER CODE END PV */
 
@@ -143,6 +146,7 @@ int main(void)
 	
 	uint16_t ui_flag = 0;
   uint8_t ui8_buf;
+	uint32_t ui32_buf;
 	
   /* USER CODE END 1 */
 
@@ -181,6 +185,9 @@ int main(void)
 	RingState.el.SchedFile = SCHED_NO;
 	RingState.el.ready = RING_SETUP;
  	
+	EventList_init(&BaseEventList);
+	EventList_init(&TodayEventList);
+	
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -201,6 +208,8 @@ int main(void)
 #ifdef USE_DS3231
   DS3231_Init(&hi2c1);
 #endif
+
+
 
   io_result = HAL_UART_Receive_IT(&huart3, (uint8_t *)&RMessHead, sizeof(RMessHead));
 
@@ -343,6 +352,20 @@ int main(void)
 			if(RingState.el.SchedFile == SCHED_RAM)
 			{
 				// parse
+				ui32_buf = EventList_ReadMem((char*)Schedule, schedule_size, &BaseEventList);
+				
+				if(ui32_buf == EL_RES_OK)
+				{
+					
+					ui32_buf = MakeTodaySchedule(&BaseEventList, s_Date* in_date,
+					                             &TodayEventList, bool* out_holyday);
+					
+					RingState.el.SchedFile = SCHED_ON; 
+				}
+				else
+				{
+					RingState.el.SchedFile = SCHED_ERR;
+				}
 				
 				// save to Flash
 	
